@@ -34,6 +34,8 @@ type
     edtEndIP: TEdit;
     ipsMain: TIniPropStorage;
     memMyIPLog: TMemo;
+    Panel1: TPanel;
+    Panel2: TPanel;
     panMyIPButtons: TPanel;
     tsMyIP: TTabSheet;
     vstScan: TLazVirtualStringTree;
@@ -195,7 +197,13 @@ end;
 
 procedure TfrmMain.actScanStartExecute(Sender: TObject);
 begin
-  //
+  actScanStart.Enabled:= False;
+  Application.ProcessMessages;
+
+  ShowMessage('Not Implemented yet.');
+
+  Application.ProcessMessages;
+  actScanStart.Enabled:= True;
 end;
 
 procedure TfrmMain.actScanStopExecute(Sender: TObject);

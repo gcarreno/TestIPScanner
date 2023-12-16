@@ -167,9 +167,37 @@ object frmMain: TfrmMain
     end
     object tsPing: TTabSheet
       Caption = '&Ping'
+      ClientHeight = 469
+      ClientWidth = 790
+      object Panel1: TPanel
+        Left = 0
+        Height = 469
+        Top = 0
+        Width = 790
+        Align = alClient
+        Caption = 'Not Implemented yet'
+        Font.Height = -40
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 0
+      end
     end
     object tsTraceRoute: TTabSheet
       Caption = '&Trace Route'
+      ClientHeight = 469
+      ClientWidth = 790
+      object Panel2: TPanel
+        Left = 0
+        Height = 469
+        Top = 0
+        Width = 790
+        Align = alClient
+        Caption = 'Not Implemented yet'
+        Font.Height = -40
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 0
+      end
     end
   end
   object alMain: TActionList
