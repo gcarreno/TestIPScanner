@@ -17,7 +17,6 @@ uses
 
 begin
   RequireDerivedFormResource:=True;
-  Application.Title:='Test IP Scanner';
   Application.Scaled:=True;
   Application.Initialize;
   Application.CreateForm(TfrmMain, frmMain);

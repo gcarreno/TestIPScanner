@@ -14,7 +14,7 @@ uses
 , ComCtrls
 , ActnList
 , Menus
-, StdActns, StdCtrls, ExtCtrls, IniPropStorage, laz.VirtualTrees
+, StdActns, StdCtrls, ExtCtrls, IniPropStorage, IPEdit, laz.VirtualTrees
 ;
 
 type
@@ -30,8 +30,8 @@ type
     btnScanStart: TButton;
     btnMyIpFetch: TButton;
     btnScanStop: TButton;
-    edtFromIP: TEdit;
-    edtEndIP: TEdit;
+    edtStartIP: TIPEdit;
+    edtEndIP: TIPEdit;
     ipsMain: TIniPropStorage;
     memMyIPLog: TMemo;
     Panel1: TPanel;
@@ -39,7 +39,7 @@ type
     panMyIPButtons: TPanel;
     tsMyIP: TTabSheet;
     vstScan: TLazVirtualStringTree;
-    lblFromIP: TLabel;
+    lblStartIP: TLabel;
     lblEndIP: TLabel;
     mnuFile: TMenuItem;
     mnuFileExit: TMenuItem;
