@@ -20,3 +20,26 @@ Notable changes up to the last release.
 
 - Adding `Not implemented yet` messages
 
+## [0.1] - 2023-12-16
+
+### Bug Fixes
+
+- CI/CD not depending in `test` job
+
+### Documentation
+
+- Adding link to original inspiration
+- Better repo purpose explanation
+- Adding banners
+
+### Features
+
+- Renamed template GUI app, just skeleton
+- My IP is completed
+- Adding version
+
+### Miscellaneous Tasks
+
+- Initial commit
+- Adding CI/CD scripts
+
