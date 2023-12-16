@@ -1,0 +1,7 @@
+object frmMain: TfrmMain
+  Left = 399
+  Height = 240
+  Top = 32
+  Width = 320
+  LCLVersion = '3.99.0.0'
+end
