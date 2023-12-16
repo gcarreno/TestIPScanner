@@ -76,6 +76,7 @@ uses
 ;
 
 const
+  cVersion = {$I version.inc};
   cPropStorageIniSection = 'main';
   cMyIPURL: array [1..4] of String = (
     'ifconfig.me',
@@ -90,6 +91,7 @@ const
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
+  Caption:= Format('%s v%s', [ Application.Title, cVersion ]);
   pcMain.ActivePageIndex:= 0;
   EnablePropertyStorage;
   InitShortcuts;
