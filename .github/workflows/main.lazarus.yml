@@ -58,7 +58,7 @@ jobs:
 
     name: 02 - Create GitHub Release
     uses: gcarreno/re-usable-workflows/.github/workflows/release.lazarus.yml@main
-    needs: [ build, test ]
+    needs: [ build ]
     with:
       config: '{
           "app-name": "TestIPScanner",
