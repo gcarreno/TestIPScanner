@@ -8,8 +8,9 @@ object frmMain: TfrmMain
   Constraints.MinHeight = 500
   Constraints.MinWidth = 800
   Menu = mmMain
-  Position = poScreenCenter
-  SessionProperties = 'pcMain.ActivePage;edtStartIP.Text;edtEndIP.Text'
+  Position = poDefault
+  SessionProperties = 'Top;Left;Width;Height;WindowState;pcMain.ActivePage;edtStartIP.Text;edtEndIP.Text'
+  LCLVersion = '3.99.0.0'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   object pcMain: TPageControl
@@ -23,7 +24,7 @@ object frmMain: TfrmMain
     TabOrder = 0
     object tsMyIP: TTabSheet
       Caption = '&My IP'
-      ClientHeight = 469
+      ClientHeight = 466
       ClientWidth = 790
       object panMyIPButtons: TPanel
         Left = 0
@@ -64,7 +65,7 @@ object frmMain: TfrmMain
     end
     object tsScan: TTabSheet
       Caption = '&Scan IP Range'
-      ClientHeight = 469
+      ClientHeight = 466
       ClientWidth = 790
       object lblStartIP: TLabel
         Left = 4
@@ -86,7 +87,7 @@ object frmMain: TfrmMain
         BorderSpacing.Top = 4
         Constraints.MaxWidth = 300
         TabOrder = 0
-        Text = '192.168.0.1'
+        Text = '192.168.  0.  1'
       end
       object lblEndIP: TLabel
         Left = 4
@@ -108,7 +109,7 @@ object frmMain: TfrmMain
         BorderSpacing.Top = 4
         Constraints.MaxWidth = 300
         TabOrder = 1
-        Text = '192.168.0.254'
+        Text = '192.168.  0.254'
       end
       object panScanButtons: TPanel
         Left = 0
@@ -164,7 +165,7 @@ object frmMain: TfrmMain
     end
     object tsPing: TTabSheet
       Caption = '&Ping'
-      ClientHeight = 469
+      ClientHeight = 466
       ClientWidth = 790
       object Panel1: TPanel
         Left = 0
@@ -181,7 +182,7 @@ object frmMain: TfrmMain
     end
     object tsTraceRoute: TTabSheet
       Caption = '&Trace Route'
-      ClientHeight = 469
+      ClientHeight = 466
       ClientWidth = 790
       object Panel2: TPanel
         Left = 0

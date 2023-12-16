@@ -10,6 +10,8 @@
 
 An attempt to do a graphical application to scan a range of IPs and some other tools.
 
+This entry on the [Test 🌟](https://github.com/gcarreno/TestStar) list is inspired by this repository: [IPAvailabilityScanner](https://github.com/vrwallace/IPAvailabilityScanner).
+
 It implements:
 1. Retrieving the machine's Public IP address from one of these providers:
     - http://ifconfig.me
@@ -20,4 +22,4 @@ It implements:
 3. Performing a Ping ( Not Implemented yet ).
 4. Performing a Trace Route ( Not Implemented yet ).
 
-This entry on the [Test 🌟](https://github.com/gcarreno/TestStar) list is inspired by this repository: [IPAvailabilityScanner](https://github.com/vrwallace/IPAvailabilityScanner).
+This application is also using the Property Storage on an `INI` file. It stores the size of the Window and some values like the last selected tab and the last inputs on several edits.
