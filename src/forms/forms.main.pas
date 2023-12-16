@@ -135,12 +135,12 @@ end;
 
 procedure TfrmMain.EnableControls;
 begin
-  actMyIPFetch.Enabled:= True;
+  pcMain.Enabled:= True;
 end;
 
 procedure TfrmMain.DisableControls;
 begin
-  actMyIPFetch.Enabled:= False;
+  pcMain.Enabled:= False;
 end;
 
 procedure TfrmMain.alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
@@ -168,12 +168,14 @@ begin
     repeat
       try
         memMyIPLog.Append(Format('Attempting to contact "%s"', [ cMyIPURL[index] ]));
+        Application.ProcessMessages;
         httpResult:= httpClient.SimpleGet(Format('http://%s', [ cMyIPURL[index] ]));
         success:= True;
       except
         on E: Exception do
         begin
           memMyIPLog.Append(Format('ERROR(%s): %s', [ cMyIPURL[index], E.Message ]));
+          Application.ProcessMessages;
           success:= False;
         end;
       end;
@@ -182,10 +184,12 @@ begin
     if success then
     begin
       memMyIPLog.Append(Format('From "%s", your IP is "%s"', [ cMyIPURL[index], Trim(httpResult) ]));
+      Application.ProcessMessages;
     end
     else
     begin
       memMyIPLog.Append('Something went horribly wrong');
+      Application.ProcessMessages;
     end;
   finally
     httpClient.Free;

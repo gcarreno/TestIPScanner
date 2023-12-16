@@ -10,7 +10,6 @@ object frmMain: TfrmMain
   Menu = mmMain
   Position = poDefault
   SessionProperties = 'Top;Left;Width;Height;WindowState;pcMain.ActivePage;edtStartIP.Text;edtEndIP.Text'
-  LCLVersion = '3.99.0.0'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   object pcMain: TPageControl
@@ -18,13 +17,13 @@ object frmMain: TfrmMain
     Height = 500
     Top = 0
     Width = 800
-    ActivePage = tsScan
+    ActivePage = tsMyIP
     Align = alClient
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 0
     object tsMyIP: TTabSheet
       Caption = '&My IP'
-      ClientHeight = 466
+      ClientHeight = 469
       ClientWidth = 790
       object panMyIPButtons: TPanel
         Left = 0
@@ -65,7 +64,7 @@ object frmMain: TfrmMain
     end
     object tsScan: TTabSheet
       Caption = '&Scan IP Range'
-      ClientHeight = 466
+      ClientHeight = 469
       ClientWidth = 790
       object lblStartIP: TLabel
         Left = 4
@@ -165,7 +164,7 @@ object frmMain: TfrmMain
     end
     object tsPing: TTabSheet
       Caption = '&Ping'
-      ClientHeight = 466
+      ClientHeight = 469
       ClientWidth = 790
       object Panel1: TPanel
         Left = 0
@@ -182,7 +181,7 @@ object frmMain: TfrmMain
     end
     object tsTraceRoute: TTabSheet
       Caption = '&Trace Route'
-      ClientHeight = 466
+      ClientHeight = 469
       ClientWidth = 790
       object Panel2: TPanel
         Left = 0
