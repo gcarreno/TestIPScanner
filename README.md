@@ -1,6 +1,6 @@
 # Test IP Scanner
 
-[![Build Status](https://github.com/gcarreno/TestIPScanner/workflows/build-test/badge.svg)](https://github.com/gcarreno/TestIPScanner/actions)
+[![Build Status](https://github.com/gcarreno/TestIPScanner/actions/workflows/main.lazarus.yml/badge.svg?branch=main)](https://github.com/gcarreno/TestIPScanner/actions)
 [![Supports Windows](https://img.shields.io/badge/support-Windows-blue?logo=Windows)](https://github.com/gcarreno/TestIPScanner/releases/latest)
 [![Supports Linux](https://img.shields.io/badge/support-Linux-yellow?logo=Linux)](https://github.com/gcarreno/TestIPScanner/releases/latest)
 [![Supports macOS](https://img.shields.io/badge/support-macOS-black?logo=macOS)](https://github.com/gcarreno/TestIPScanner/releases/latest)
