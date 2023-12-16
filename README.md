@@ -8,6 +8,16 @@
 [![Latest Release](https://img.shields.io/github/v/release/gcarreno/TestIPScanner?label=latest%20release)](https://github.com/gcarreno/TestIPScanner/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/gcarreno/TestIPScanner/total)](https://github.com/gcarreno/TestIPScanner/releases)
 
-An attempt to do a graphical application to scan a range of IPs.
+An attempt to do a graphical application to scan a range of IPs and some other tools.
 
-This entry on the Test-Star list is inspired by this repository: [IPAvailabilityScanner](https://github.com/vrwallace/IPAvailabilityScanner).
+It implements:
+1. Retrieving the machine's Public IP address from one of these providers:
+  - http://ifconfig.me
+  - http://ifconfig.co
+  - http://ipecho.net/plain
+  - http://checkip.amazonaws.com
+2. Performing an IP scan on a range of IPs ( Not Implemented yet ).
+3. Performing a Ping ( Not Implemented yet ).
+4. Performing a Trace Route ( Not Implemented yet ).
+
+This entry on the [Test 🌟](https://github.com/gcarreno/TestStar) list is inspired by this repository: [IPAvailabilityScanner](https://github.com/vrwallace/IPAvailabilityScanner).
