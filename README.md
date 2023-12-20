@@ -23,3 +23,15 @@ It implements:
 4. Performing a Trace Route ( Not Implemented yet ).
 
 This application is also using the Property Storage on an `INI` file. It stores the size of the Window and some values like the last selected tab and the last inputs on several edits.
+
+## Important Details
+
+### Linux
+
+In order to perform a Ping the packet needs to be in raw mode. This implies it needs super user permissions.
+
+If you want Ping and TraceRoute to work you must run the program with `sudo`:
+
+```console
+$ sudo bin/TestIPScanner
+```

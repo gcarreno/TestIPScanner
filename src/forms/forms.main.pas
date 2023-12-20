@@ -22,6 +22,7 @@ type
   { TfrmMain }
 
   TfrmMain = class(TForm)
+    actPingStart: TAction;
     actScanStop: TAction;
     actMyIPFetch: TAction;
     actScanStart: TAction;
@@ -30,11 +31,15 @@ type
     btnScanStart: TButton;
     btnMyIpFetch: TButton;
     btnScanStop: TButton;
+    btnPingStart: TButton;
     edtStartIP: TIPEdit;
     edtEndIP: TIPEdit;
+    edtPingHost: TIPEdit;
     ipsMain: TIniPropStorage;
+    lblPingHost: TLabel;
     memMyIPLog: TMemo;
-    Panel1: TPanel;
+    memPingLog: TMemo;
+    panPingButtons: TPanel;
     Panel2: TPanel;
     panMyIPButtons: TPanel;
     tsMyIP: TTabSheet;
@@ -50,6 +55,7 @@ type
     tsPing: TTabSheet;
     tsScan: TTabSheet;
     procedure actMyIPFetchExecute(Sender: TObject);
+    procedure actPingStartExecute(Sender: TObject);
     procedure actScanStartExecute(Sender: TObject);
     procedure actScanStopExecute(Sender: TObject);
     procedure alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
@@ -75,6 +81,7 @@ implementation
 uses
   LCLType
 , fphttpclient
+, pingsend
 ;
 
 const
@@ -193,6 +200,43 @@ begin
     end;
   finally
     httpClient.Free;
+  end;
+
+  Application.ProcessMessages;
+  EnableControls;
+end;
+
+procedure TfrmMain.actPingStartExecute(Sender: TObject);
+var
+  pingClient: TPINGSend;
+  index: Integer;
+begin
+  DisableControls;
+  Application.ProcessMessages;
+
+  memPingLog.Append(Format('Will now Ping "%s" 3 times', [ edtPingHost.TextTrimmed ]));
+  Application.ProcessMessages;
+  pingClient:= TPINGSend.Create;
+  try
+    for index:= 1 to 3 do
+    begin
+      memPingLog.Append(Format('Attempt %d...', [ index ]));
+      Application.ProcessMessages;
+
+      if pingClient.Ping(edtPingHost.TextTrimmed) then
+      begin
+        memPingLog.Append(Format('Attempt %d: %d ms', [ index, pingClient.PingTime ]));
+        Application.ProcessMessages;
+      end
+      else
+      begin
+        memPingLog.Append(Format('Attempt %d failed. ', [ index ]));
+        Application.ProcessMessages;
+        break;
+      end;
+    end;
+  finally
+    pingClient.Free;
   end;
 
   Application.ProcessMessages;
