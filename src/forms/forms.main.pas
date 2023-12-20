@@ -96,11 +96,10 @@ uses
 const
   cVersion = {$I version.inc};
   cPropStorageIniSection = 'main';
-  cMyIPURL: array [1..4] of String = (
+  cMyIPURL: array [1..3] of String = (
     'ifconfig.me',
-    'ifconfig.co',
-    'ipecho.net/plain',
-    'checkip.amazonaws.com'
+    'checkip.amazonaws.com',
+    'ipecho.net/plain'
   );
 
 {$R *.lfm}
@@ -219,7 +218,7 @@ begin
         end;
       end;
       Inc(index);
-    until (success) or (index > 4);
+    until (success) or (index > High(cMyIPURL));
     if success then
     begin
       memMyIPLog.Append(Format('From "%s", your IP is "%s"', [ cMyIPURL[index], Trim(httpResult) ]));
