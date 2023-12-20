@@ -35,3 +35,11 @@ If you want Ping and TraceRoute to work you must run the program with `sudo`:
 ```console
 $ sudo bin/TestIPScanner
 ```
+
+### Windows
+
+I'm unable to test under Windows so I'll need some help here.
+
+### macOS
+
+I'm unable to test under macOS so I'll need some help here.
