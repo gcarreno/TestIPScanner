@@ -22,30 +22,35 @@ type
   { TfrmMain }
 
   TfrmMain = class(TForm)
+    actTraceStart: TAction;
     actPingStart: TAction;
     actScanStop: TAction;
     actMyIPFetch: TAction;
     actScanStart: TAction;
     alMain: TActionList;
     actFileExit: TFileExit;
+    btnTraceStart: TButton;
     btnScanStart: TButton;
     btnMyIpFetch: TButton;
     btnScanStop: TButton;
     btnPingStart: TButton;
-    edtStartIP: TIPEdit;
-    edtEndIP: TIPEdit;
+    edtTraceHost: TIPEdit;
+    edtScanStartIP: TIPEdit;
+    edtScanEndIP: TIPEdit;
     edtPingHost: TIPEdit;
     ipsMain: TIniPropStorage;
     lblPingHost: TLabel;
+    lblTraceHost: TLabel;
     memMyIPLog: TMemo;
     memPingLog: TMemo;
+    memTraceLog: TMemo;
     panPingButtons: TPanel;
-    Panel2: TPanel;
     panMyIPButtons: TPanel;
+    panTraceButtons: TPanel;
     tsMyIP: TTabSheet;
     vstScan: TLazVirtualStringTree;
-    lblStartIP: TLabel;
-    lblEndIP: TLabel;
+    lblScanStartIP: TLabel;
+    lblScanEndIP: TLabel;
     mnuFile: TMenuItem;
     mnuFileExit: TMenuItem;
     mmMain: TMainMenu;
@@ -55,11 +60,13 @@ type
     tsPing: TTabSheet;
     tsScan: TTabSheet;
     procedure actMyIPFetchExecute(Sender: TObject);
-    procedure actPingStartExecute(Sender: TObject);
     procedure actScanStartExecute(Sender: TObject);
     procedure actScanStopExecute(Sender: TObject);
+    procedure actPingStartExecute(Sender: TObject);
+    procedure actTraceStartExecute(Sender: TObject);
     procedure alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
 
     procedure EnablePropertyStorage;
@@ -67,6 +74,7 @@ type
     procedure InitShortcuts;
     procedure EnableControls;
     procedure DisableControls;
+    procedure pcMainChange(Sender: TObject);
   private
 
   public
@@ -81,6 +89,7 @@ implementation
 uses
   LCLType
 , fphttpclient
+, blcksock
 , pingsend
 ;
 
@@ -101,9 +110,27 @@ const
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   Caption:= Format('%s v%s', [ Application.Title, cVersion ]);
-  pcMain.ActivePageIndex:= 0;
+  if pcMain.ActivePageIndex <> 0 then pcMain.ActivePageIndex:= 0;
   EnablePropertyStorage;
   InitShortcuts;
+end;
+
+procedure TfrmMain.FormShow(Sender: TObject);
+begin
+  case pcMain.ActivePageIndex of
+    0:begin // MyIP
+      // Do Nothing
+    end;
+    1:begin // Scan
+      edtScanStartIP.SetFocus;
+    end;
+    2:begin // Ping
+      edtPingHost.SetFocus;
+    end;
+    3:begin // Trate Route
+      edtTraceHost.SetFocus;
+    end;
+  end;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -148,6 +175,11 @@ end;
 procedure TfrmMain.DisableControls;
 begin
   pcMain.Enabled:= False;
+end;
+
+procedure TfrmMain.pcMainChange(Sender: TObject);
+begin
+
 end;
 
 procedure TfrmMain.alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
@@ -206,6 +238,22 @@ begin
   EnableControls;
 end;
 
+procedure TfrmMain.actScanStartExecute(Sender: TObject);
+begin
+  actScanStart.Enabled:= False;
+  Application.ProcessMessages;
+
+  ShowMessage('Not Implemented yet.');
+
+  Application.ProcessMessages;
+  actScanStart.Enabled:= True;
+end;
+
+procedure TfrmMain.actScanStopExecute(Sender: TObject);
+begin
+  //
+end;
+
 procedure TfrmMain.actPingStartExecute(Sender: TObject);
 var
   pingClient: TPINGSend;
@@ -243,20 +291,46 @@ begin
   EnableControls;
 end;
 
-procedure TfrmMain.actScanStartExecute(Sender: TObject);
+procedure TfrmMain.actTraceStartExecute(Sender: TObject);
+var
+  traceClient: TPINGSend;
+  ttl: byte;
 begin
-  actScanStart.Enabled:= False;
+  DisableControls;
   Application.ProcessMessages;
 
-  ShowMessage('Not Implemented yet.');
+  memTraceLog.Append(Format('Will now Trace Route "%s" (Max 29 Hops)', [ edtTraceHost.TextTrimmed ]));
+  Application.ProcessMessages;
+
+  traceClient:= TPINGSend.Create;
+  try
+    ttl:= 1;
+    repeat
+      traceClient.TTL := ttl;
+      inc(ttl);
+      if ttl > 30 then break;
+      if not traceClient.Ping(edtTraceHost.TextTrimmed) then
+      begin
+        memTraceLog.Append(Format('Hop %d "%s":  %s Timeout', [ Pred(ttl), cAnyHost, traceClient.ReplyFrom ]));
+        Application.ProcessMessages;
+        continue;
+      end;
+      if (traceClient.ReplyError <> IE_NoError) and
+         (traceClient.ReplyError <> IE_TTLExceed) then
+      begin
+        memTraceLog.Append(Format('Hop %d "%s": %s', [ Pred(ttl), traceClient.ReplyFrom,  traceClient.ReplyErrorDesc ]));
+        Application.ProcessMessages;
+        break;
+      end;
+      memTraceLog.Append(Format('Hop %d "%s": %d ms', [ Pred(ttl), traceClient.ReplyFrom,  traceClient.PingTime ]));
+      Application.ProcessMessages;
+    until traceClient.ReplyError = IE_NoError;
+  finally
+    traceClient.Free;
+  end;
 
   Application.ProcessMessages;
-  actScanStart.Enabled:= True;
-end;
-
-procedure TfrmMain.actScanStopExecute(Sender: TObject);
-begin
-  //
+  EnableControls;
 end;
 
 end.
