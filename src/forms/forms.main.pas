@@ -34,10 +34,10 @@ type
     btnMyIpFetch: TButton;
     btnScanStop: TButton;
     btnPingStart: TButton;
-    edtTraceHost: TIPEdit;
+    edtPingHost: TEdit;
+    edtTraceHost: TEdit;
     edtScanStartIP: TIPEdit;
     edtScanEndIP: TIPEdit;
-    edtPingHost: TIPEdit;
     ipsMain: TIniPropStorage;
     lblPingHost: TLabel;
     lblTraceHost: TLabel;
@@ -124,7 +124,7 @@ begin
       edtScanStartIP.SetFocus;
     end;
     2:begin // Ping
-      edtPingHost.SetFocus;
+      // Do nothing
     end;
     3:begin // Trate Route
       edtTraceHost.SetFocus;
@@ -258,10 +258,16 @@ var
   pingClient: TPINGSend;
   index: Integer;
 begin
+  if not Length(edtPingHost.Text) > 0 then
+  begin
+    ShowMessage('The host field needs to have a value!');
+    exit;
+  end;
+
   DisableControls;
   Application.ProcessMessages;
 
-  memPingLog.Append(Format('Will now Ping "%s" 3 times', [ edtPingHost.TextTrimmed ]));
+  memPingLog.Append(Format('Will now Ping "%s" 3 times', [ edtPingHost.Text ]));
   Application.ProcessMessages;
   pingClient:= TPINGSend.Create;
   try
@@ -270,14 +276,14 @@ begin
       memPingLog.Append(Format('Attempt %d...', [ index ]));
       Application.ProcessMessages;
 
-      if pingClient.Ping(edtPingHost.TextTrimmed) then
+      if pingClient.Ping(edtPingHost.Text) then
       begin
-        memPingLog.Append(Format('Attempt %d: %d ms', [ index, pingClient.PingTime ]));
+        memPingLog.Append(Format('Attempt %d: %s - %d ms', [ index, pingClient.ReplyFrom, pingClient.PingTime ]));
         Application.ProcessMessages;
       end
       else
       begin
-        memPingLog.Append(Format('Attempt %d failed. ', [ index ]));
+        memPingLog.Append(Format('Attempt %d failed: (%d) %s', [ index, pingClient.ReplyCode, pingClient.ReplyErrorDesc ]));
         Application.ProcessMessages;
         break;
       end;
@@ -295,10 +301,16 @@ var
   traceClient: TPINGSend;
   ttl: byte;
 begin
+  if not Length(edtTraceHost.Text) > 0 then
+  begin
+    ShowMessage('The host field needs to have a value!');
+    exit;
+  end;
+
   DisableControls;
   Application.ProcessMessages;
 
-  memTraceLog.Append(Format('Will now Trace Route "%s" (Max 29 Hops)', [ edtTraceHost.TextTrimmed ]));
+  memTraceLog.Append(Format('Will now Trace Route "%s" (Max 29 Hops)', [ edtTraceHost.Text ]));
   Application.ProcessMessages;
 
   traceClient:= TPINGSend.Create;
@@ -308,7 +320,7 @@ begin
       traceClient.TTL := ttl;
       inc(ttl);
       if ttl > 30 then break;
-      if not traceClient.Ping(edtTraceHost.TextTrimmed) then
+      if not traceClient.Ping(edtTraceHost.Text) then
       begin
         memTraceLog.Append(Format('Hop %d "%s":  %s Timeout', [ Pred(ttl), cAnyHost, traceClient.ReplyFrom ]));
         Application.ProcessMessages;

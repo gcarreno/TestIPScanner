@@ -48,5 +48,5 @@ I'm unable to test under macOS so I'll need some help here.
 
 ## Known bugs
 
-- The IP Edit component needs to be focused in order to refresh internal fields right after starting up the application
+- The IP Edit component needs to be focused in order to refresh internal fields right after starting up the application.
     For some reason, when the `TINIPropStorage` fills in the `TIPEdit.Text` property, the component does not refresh the internal fields.
