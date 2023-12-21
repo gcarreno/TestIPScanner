@@ -14,7 +14,12 @@ uses
 , ComCtrls
 , ActnList
 , Menus
-, StdActns, StdCtrls, ExtCtrls, IniPropStorage, IPEdit, laz.VirtualTrees
+, StdActns
+, StdCtrls
+, ExtCtrls
+, IniPropStorage
+, IPEdit
+, laz.VirtualTrees
 ;
 
 type
@@ -22,6 +27,7 @@ type
   { TfrmMain }
 
   TfrmMain = class(TForm)
+    actScanClear: TAction;
     actTraceStart: TAction;
     actPingStart: TAction;
     actScanStop: TAction;
@@ -34,6 +40,7 @@ type
     btnMyIpFetch: TButton;
     btnScanStop: TButton;
     btnPingStart: TButton;
+    btnScanClear: TButton;
     edtPingHost: TEdit;
     edtTraceHost: TEdit;
     edtScanStartIP: TIPEdit;
@@ -44,6 +51,7 @@ type
     memMyIPLog: TMemo;
     memPingLog: TMemo;
     memTraceLog: TMemo;
+    panExitWarning: TPanel;
     panPingButtons: TPanel;
     panMyIPButtons: TPanel;
     panTraceButtons: TPanel;
@@ -62,11 +70,17 @@ type
     procedure actMyIPFetchExecute(Sender: TObject);
     procedure actScanStartExecute(Sender: TObject);
     procedure actScanStopExecute(Sender: TObject);
+    procedure actScanClearExecute(Sender: TObject);
     procedure actPingStartExecute(Sender: TObject);
     procedure actTraceStartExecute(Sender: TObject);
     procedure alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
+    procedure vstScanGetNodeDataSize(Sender: TBaseVirtualTree;
+      var NodeDataSize: Integer);
+    procedure vstScanGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormDestroy(Sender: TObject);
 
     procedure EnablePropertyStorage;
@@ -74,7 +88,6 @@ type
     procedure InitShortcuts;
     procedure EnableControls;
     procedure DisableControls;
-    procedure pcMainChange(Sender: TObject);
   private
 
   public
@@ -102,6 +115,16 @@ const
     'ipecho.net/plain'
   );
 
+type
+  PScanEntry = ^TScanEntry;
+  TScanEntry = record
+    IP: String;
+    Status: String;
+  end;
+
+var
+  DisplayExitMessage: Boolean = False;
+
 {$R *.lfm}
 
 { TfrmMain }
@@ -127,9 +150,20 @@ begin
       // Do nothing
     end;
     3:begin // Trate Route
-      edtTraceHost.SetFocus;
+      // Do Nothing
     end;
   end;
+end;
+
+procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+begin
+  if DisplayExitMessage then
+  begin
+    pcMain.Visible:= False;
+    panExitWarning.Align:= alClient;
+    Application.ProcessMessages;
+  end;
+  CanClose:= True;
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -176,17 +210,45 @@ begin
   pcMain.Enabled:= False;
 end;
 
-procedure TfrmMain.pcMainChange(Sender: TObject);
-begin
-
-end;
-
 procedure TfrmMain.alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
 begin
   if AAction = actScanStop then
   begin
     actScanStop.Enabled:= not actScanStart.Enabled;
     Handled:= True;
+  end;
+  if AAction = actScanClear then
+  begin
+    actScanClear.Enabled:= (vstScan.RootNodeCount > 0) and (actScanStart.Enabled);
+    Handled:= True;
+  end;
+end;
+
+procedure TfrmMain.vstScanGetNodeDataSize(Sender: TBaseVirtualTree;
+  var NodeDataSize: Integer);
+begin
+  NodeDataSize:= SizeOf(TScanEntry);
+end;
+
+procedure TfrmMain.vstScanGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
+  Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
+var
+  entry: PScanEntry;
+begin
+  if Assigned(Node) then
+  begin
+    entry:= Sender.GetNodeData(Node);
+    if Assigned(entry) then
+    begin
+      case Column of
+        0:begin
+          CellText:= entry^.IP;
+        end;
+        1:begin
+          CellText:= entry^.Status;
+        end;
+      end;
+    end;
   end;
 end;
 
@@ -238,19 +300,106 @@ begin
 end;
 
 procedure TfrmMain.actScanStartExecute(Sender: TObject);
+var
+  node: PVirtualNode = nil;
+  entry: PScanEntry = nil;
+  index0,
+  index1,
+  index2,
+  index3: Integer;
+  quadStart,
+  quadEnd: TStringArray;
 begin
+  DisplayExitMessage:= True;
+
   actScanStart.Enabled:= False;
   Application.ProcessMessages;
+  try
 
-  ShowMessage('Not Implemented yet.');
+    quadStart:= edtScanStartIP.TextTrimmed.Split(['.']);
+    quadEnd:= edtScanEndIP.TextTrimmed.Split(['.']);
 
-  Application.ProcessMessages;
-  actScanStart.Enabled:= True;
+    if (StrToInt(quadStart[0]) > StrToInt(quadEnd[0])) or
+       (StrToInt(quadStart[1]) > StrToInt(quadEnd[1])) or
+       (StrToInt(quadStart[2]) > StrToInt(quadEnd[2])) or
+       (StrToInt(quadStart[3]) > StrToInt(quadEnd[3])) then
+    begin
+      ShowMessage('Start IP should be numerically before End IP');
+      exit;
+    end;
+    vstScan.BeginUpdate;
+    vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions - [toReadOnly];
+
+    if vstScan.RootNodeCount > 0 then
+    begin
+      vstScan.Clear;
+    end;
+
+    for index0:= StrToInt(quadStart[0]) to StrToInt(quadEnd[0]) do
+    begin
+      for index1:= StrToInt(quadStart[1]) to StrToInt(quadEnd[1]) do
+      begin
+        for index2:= StrToInt(quadStart[2]) to StrToInt(quadEnd[2]) do
+        begin
+          for index3:= StrToInt(quadStart[3]) to StrToInt(quadEnd[3]) do
+          begin
+            node:= vstScan.AddChild(vstScan.RootNode);
+            if Assigned(node) then
+            begin
+              entry:= vstScan.GetNodeData(node);
+              if Assigned(entry) then
+              begin
+                entry^.IP:= Format('%d.%d.%d.%d', [
+                  index0,
+                  index1,
+                  index2,
+                  index3
+                ]);
+                entry^.Status:= 'Waiting';
+              end;
+            end;
+          end;
+        end;
+      end;
+    end;
+
+    vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions + [toReadOnly];
+    vstScan.EndUpdate;
+
+  finally
+    Application.ProcessMessages;
+    //actScanStart.Enabled:= True;
+  end;
 end;
 
 procedure TfrmMain.actScanStopExecute(Sender: TObject);
 begin
-  //
+  btnScanStop.Enabled:= False;
+  Application.ProcessMessages;
+  try
+
+    vstScan.BeginUpdate;
+    vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions - [toReadOnly];
+
+    vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions + [toReadOnly];
+    vstScan.EndUpdate;
+
+  finally
+    Application.ProcessMessages;
+    actScanStart.Enabled:= True;
+  end;
+end;
+
+procedure TfrmMain.actScanClearExecute(Sender: TObject);
+begin
+  if vstScan.RootNodeCount > 0 then
+  begin
+    vstScan.BeginUpdate;
+    vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions - [toReadOnly];
+    vstScan.Clear;
+    vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions + [toReadOnly];
+    vstScan.EndUpdate;
+  end;
 end;
 
 procedure TfrmMain.actPingStartExecute(Sender: TObject);
