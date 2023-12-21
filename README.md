@@ -38,8 +38,15 @@ $ sudo bin/TestIPScanner
 
 ### Windows
 
-I'm unable to test under Windows so I'll need some help here.
+This has been tested under Windows 11 and it is working on both non and "Run as User".
+
+Many thanks to [ikel](https://github.com/ikelaiah) for doing the tests.
 
 ### macOS
 
 I'm unable to test under macOS so I'll need some help here.
+
+## Known bugs
+
+- The IP Edit component needs to be focused in order to refresh internal fields right after starting up the application
+    For some reason, when the `TINIPropStorage` fills in the `TIPEdit.Text` property, the component does not refresh the internal fields.
