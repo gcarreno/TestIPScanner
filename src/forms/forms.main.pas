@@ -20,6 +20,7 @@ uses
 , IniPropStorage
 , IPEdit
 , laz.VirtualTrees
+, Threads.Pool
 ;
 
 type
@@ -74,12 +75,12 @@ type
     procedure actPingStartExecute(Sender: TObject);
     procedure actTraceStartExecute(Sender: TObject);
     procedure alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
+    procedure pcMainChange(Sender: TObject);
     procedure vstScanGetNodeDataSize(Sender: TBaseVirtualTree;
       var NodeDataSize: Integer);
     procedure vstScanGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
     procedure FormCreate(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormDestroy(Sender: TObject);
 
@@ -89,7 +90,10 @@ type
     procedure EnableControls;
     procedure DisableControls;
   private
+    FScanThreadPool: TScanThreadPool;
 
+    procedure ScanEnded(Sender: TObject);
+    procedure ScanUpdate(const ANode: PVirtualNode; const AStatus: String);
   public
 
   end;
@@ -104,6 +108,7 @@ uses
 , fphttpclient
 , blcksock
 , pingsend
+, Data.Scan
 ;
 
 const
@@ -114,13 +119,6 @@ const
     'checkip.amazonaws.com',
     'ipecho.net/plain'
   );
-
-type
-  PScanEntry = ^TScanEntry;
-  TScanEntry = record
-    IP: String;
-    Status: String;
-  end;
 
 var
   DisplayExitMessage: Boolean = False;
@@ -135,24 +133,7 @@ begin
   if pcMain.ActivePageIndex <> 0 then pcMain.ActivePageIndex:= 0;
   EnablePropertyStorage;
   InitShortcuts;
-end;
-
-procedure TfrmMain.FormShow(Sender: TObject);
-begin
-  case pcMain.ActivePageIndex of
-    0:begin // MyIP
-      // Do Nothing
-    end;
-    1:begin // Scan
-      edtScanStartIP.SetFocus;
-    end;
-    2:begin // Ping
-      // Do nothing
-    end;
-    3:begin // Trate Route
-      // Do Nothing
-    end;
-  end;
+  FScanThreadPool:= nil;
 end;
 
 procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -168,6 +149,12 @@ end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
+  if Assigned(FScanThreadPool) then
+  begin
+    FScanThreadPool.Terminate;
+    FScanThreadPool.WaitFor;
+    FScanThreadPool.Free;
+  end;
   DisablePropertyStorage;
 end;
 
@@ -210,6 +197,29 @@ begin
   pcMain.Enabled:= False;
 end;
 
+procedure TfrmMain.ScanEnded(Sender: TObject);
+begin
+  actScanStart.Enabled:= True;
+end;
+
+procedure TfrmMain.ScanUpdate(const ANode: PVirtualNode; const AStatus: String);
+var
+  entry: PScanEntry;
+begin
+  vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions - [toReadOnly];
+  if Assigned(ANode) then
+  begin
+    entry:= vstScan.GetNodeData(ANode);
+    if Assigned(entry) then
+    begin
+      vstScan.BeginUpdate;
+      entry^.Status:= AStatus;
+      vstScan.EndUpdate;
+    end;
+  end;
+  vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions + [toReadOnly];
+end;
+
 procedure TfrmMain.alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
 begin
   if AAction = actScanStop then
@@ -221,6 +231,25 @@ begin
   begin
     actScanClear.Enabled:= (vstScan.RootNodeCount > 0) and (actScanStart.Enabled);
     Handled:= True;
+  end;
+end;
+
+procedure TfrmMain.pcMainChange(Sender: TObject);
+begin
+  case pcMain.ActivePageIndex of
+    0:begin // MyIP
+      btnMyIpFetch.SetFocus;
+    end;
+    1:begin // Scan
+      edtScanEndIP.SetFocus;
+      edtScanStartIP.SetFocus;
+    end;
+    2:begin // Ping
+      edtPingHost.SetFocus;
+    end;
+    3:begin // Trate Route
+      edtTraceHost.SetFocus;
+    end;
   end;
 end;
 
@@ -366,9 +395,11 @@ begin
     vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions + [toReadOnly];
     vstScan.EndUpdate;
 
+    FScanThreadPool:= TScanThreadPool.Create(@ScanEnded, @ScanUpdate);
+    FScanThreadPool.StartScan(vstScan, vstScan.RootNode^.FirstChild);
+
   finally
     Application.ProcessMessages;
-    //actScanStart.Enabled:= True;
   end;
 end;
 
@@ -378,11 +409,10 @@ begin
   Application.ProcessMessages;
   try
 
-    vstScan.BeginUpdate;
-    vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions - [toReadOnly];
-
-    vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions + [toReadOnly];
-    vstScan.EndUpdate;
+    FScanThreadPool.Terminate;
+    FScanThreadPool.WaitFor;
+    FScanThreadPool.Free;
+    FScanThreadPool:= nil;
 
   finally
     Application.ProcessMessages;

@@ -26,7 +26,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="forms"/>
+            <OtherUnitFiles Value="forms;threads;data"/>
             <UnitOutputDirectory Value="../bin/lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -74,7 +74,7 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="forms"/>
+            <OtherUnitFiles Value="forms;threads;data"/>
             <UnitOutputDirectory Value="../bin/lib/$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <CodeGeneration>
@@ -127,7 +127,7 @@
         <PackageName Value="LCL"/>
       </Item4>
     </RequiredPackages>
-    <Units Count="2">
+    <Units Count="6">
       <Unit0>
         <Filename Value="TestIPScanner.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -140,6 +140,26 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Forms.Main"/>
       </Unit1>
+      <Unit2>
+        <Filename Value="data/data.scan.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Data.Scan"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="threads/threads.common.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Threads.Common"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="threads/threads.pool.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Threads.Pool"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="threads/threads.worker.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Threads.Worker"/>
+      </Unit5>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -149,7 +169,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="forms"/>
+      <OtherUnitFiles Value="forms;threads;data"/>
       <UnitOutputDirectory Value="../bin/lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>

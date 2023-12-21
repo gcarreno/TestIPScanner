@@ -10,7 +10,7 @@ uses
   athreads,
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Forms.Main
+  Forms, Forms.Main, Threads.Common
   { you can add units after this };
 
 {$R *.res}
