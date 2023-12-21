@@ -54,6 +54,8 @@ end;
 
 destructor TScanThreadWorker.Destroy;
 begin
+  FVirtualNode:= nil;
+  FOnScanUpdate:= nil;
   inherited Destroy;
 end;
 
@@ -68,6 +70,15 @@ end;
 procedure TScanThreadWorker.Execute;
 begin
   FScanEntry.Status:='Starting...';
+  Synchronize(@DoScanUpdate);
+  Sleep(20);
+  FScanEntry.Status:='Scanning HTTP...';
+  Synchronize(@DoScanUpdate);
+  Sleep(20);
+  FScanEntry.Status:='Scanning HTTPS...';
+  Synchronize(@DoScanUpdate);
+  Sleep(20);
+  FScanEntry.Status:='Scanning DNS...';
   Synchronize(@DoScanUpdate);
   Sleep(20);
   FScanEntry.Status:='Done!';

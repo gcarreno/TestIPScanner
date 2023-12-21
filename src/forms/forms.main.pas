@@ -52,7 +52,6 @@ type
     memMyIPLog: TMemo;
     memPingLog: TMemo;
     memTraceLog: TMemo;
-    panExitWarning: TPanel;
     panPingButtons: TPanel;
     panMyIPButtons: TPanel;
     panTraceButtons: TPanel;
@@ -76,12 +75,12 @@ type
     procedure actTraceStartExecute(Sender: TObject);
     procedure alMainUpdate(AAction: TBasicAction; var Handled: Boolean);
     procedure pcMainChange(Sender: TObject);
+    procedure vstScanFreeNode(Sender: TBaseVirtualTree; Node: PVirtualNode);
     procedure vstScanGetNodeDataSize(Sender: TBaseVirtualTree;
       var NodeDataSize: Integer);
     procedure vstScanGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: String);
     procedure FormCreate(Sender: TObject);
-    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormDestroy(Sender: TObject);
 
     procedure EnablePropertyStorage;
@@ -120,9 +119,6 @@ const
     'ipecho.net/plain'
   );
 
-var
-  DisplayExitMessage: Boolean = False;
-
 {$R *.lfm}
 
 { TfrmMain }
@@ -136,25 +132,8 @@ begin
   FScanThreadPool:= nil;
 end;
 
-procedure TfrmMain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-begin
-  if DisplayExitMessage then
-  begin
-    pcMain.Visible:= False;
-    panExitWarning.Align:= alClient;
-    Application.ProcessMessages;
-  end;
-  CanClose:= True;
-end;
-
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
-  if Assigned(FScanThreadPool) then
-  begin
-    FScanThreadPool.Terminate;
-    FScanThreadPool.WaitFor;
-    FScanThreadPool.Free;
-  end;
   DisablePropertyStorage;
 end;
 
@@ -253,6 +232,19 @@ begin
   end;
 end;
 
+procedure TfrmMain.vstScanFreeNode(Sender: TBaseVirtualTree;
+  Node: PVirtualNode);
+var
+  entry: PScanEntry;
+begin
+  if Assigned(Node) then
+  begin
+    entry:= Sender.GetNodeData(Node);
+    if Assigned(entry) then
+      Finalize(entry^);
+  end;
+end;
+
 procedure TfrmMain.vstScanGetNodeDataSize(Sender: TBaseVirtualTree;
   var NodeDataSize: Integer);
 begin
@@ -339,8 +331,6 @@ var
   quadStart,
   quadEnd: TStringArray;
 begin
-  DisplayExitMessage:= True;
-
   actScanStart.Enabled:= False;
   Application.ProcessMessages;
   try
@@ -411,8 +401,6 @@ begin
 
     FScanThreadPool.Terminate;
     FScanThreadPool.WaitFor;
-    FScanThreadPool.Free;
-    FScanThreadPool:= nil;
 
   finally
     Application.ProcessMessages;

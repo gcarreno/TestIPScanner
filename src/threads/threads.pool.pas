@@ -22,7 +22,7 @@ type
     FVirtualTree: TLazVirtualStringTree;
     FVirtualNode: PVirtualNode;
     FCriticalSection: TCriticalSection;
-    FThreadsActive: Integer;
+    FActiveThreads: Integer;
 
     procedure WorkerThreadTerminated(Sender: TObject);
   protected
@@ -45,15 +45,18 @@ constructor TScanThreadPool.Create(const AOnThreadTerminate: TNotifyEvent;
   const AOnScanUpdate: TOnScanUpdate);
 begin
   inherited Create(True);
-  FreeOnTerminate:= False;
+  FreeOnTerminate:= True;
   OnTerminate:= AOnThreadTerminate;
   FOnScanUpdate:= AOnScanUpdate;
-  FThreadsActive:= 0;
+  FActiveThreads:= 0;
   FCriticalSection:= TCriticalSection.Create;
 end;
 
 destructor TScanThreadPool.Destroy;
 begin
+  FOnScanUpdate:= nil;
+  FVirtualTree:= nil;
+  FVirtualNode:= nil;
   FCriticalSection.Free;
   inherited Destroy;
 end;
@@ -70,7 +73,7 @@ procedure TScanThreadPool.WorkerThreadTerminated(Sender: TObject);
 begin
   FCriticalSection.Acquire;
   try
-    Dec(FThreadsActive);
+    Dec(FActiveThreads);
   finally
     FCriticalSection.Release;
   end;
@@ -85,7 +88,7 @@ begin
   begin
     FCriticalSection.Acquire;
     try
-      if FThreadsActive < 4 then
+      if FActiveThreads < 4 then
       begin
         if Assigned(FVirtualNode) then
         begin
@@ -99,16 +102,16 @@ begin
               FOnScanUpdate
             );
             worker.Start;
+            Inc(FActiveThreads);
           end;
           FVirtualNode:= FVirtualNode^.NextSibling;
-          if FVirtualNode = nil then break;
         end;
       end;
-      Inc(FThreadsActive);
     finally
       FCriticalSection.Release;
     end;
-    Sleep(100);
+    if (FActiveThreads = 0) and (FVirtualNode = nil) then break;
+    Sleep(1);
   end;
 end;
 
