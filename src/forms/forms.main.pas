@@ -258,7 +258,7 @@ var
   pingClient: TPINGSend;
   index: Integer;
 begin
-  if not Length(edtPingHost.Text) > 0 then
+  if not (Length(edtPingHost.Text) > 0) then
   begin
     ShowMessage('The host field needs to have a value!');
     exit;
@@ -278,12 +278,20 @@ begin
 
       if pingClient.Ping(edtPingHost.Text) then
       begin
-        memPingLog.Append(Format('Attempt %d: %s - %d ms', [ index, pingClient.ReplyFrom, pingClient.PingTime ]));
+        memPingLog.Append(Format('Attempt %d: %s - %d ms', [
+          index,
+          pingClient.ReplyFrom,
+          pingClient.PingTime
+        ]));
         Application.ProcessMessages;
       end
       else
       begin
-        memPingLog.Append(Format('Attempt %d failed: (%d) %s', [ index, pingClient.ReplyCode, pingClient.ReplyErrorDesc ]));
+        memPingLog.Append(Format('Attempt %d failed: (%d) %s', [
+          index,
+          pingClient.ReplyCode,
+          pingClient.ReplyErrorDesc
+        ]));
         Application.ProcessMessages;
         break;
       end;
@@ -301,7 +309,7 @@ var
   traceClient: TPINGSend;
   ttl: byte;
 begin
-  if not Length(edtTraceHost.Text) > 0 then
+  if not (Length(edtTraceHost.Text) > 0) then
   begin
     ShowMessage('The host field needs to have a value!');
     exit;
@@ -322,18 +330,31 @@ begin
       if ttl > 30 then break;
       if not traceClient.Ping(edtTraceHost.Text) then
       begin
-        memTraceLog.Append(Format('Hop %d "%s":  %s Timeout', [ Pred(ttl), cAnyHost, traceClient.ReplyFrom ]));
+        memTraceLog.Append(Format('Hop %.2d (%s): (%d) %s or Timeout', [
+          Pred(ttl),
+          cAnyHost,
+          traceClient.ReplyCode,
+          traceClient.ReplyErrorDesc
+        ]));
         Application.ProcessMessages;
         continue;
       end;
       if (traceClient.ReplyError <> IE_NoError) and
          (traceClient.ReplyError <> IE_TTLExceed) then
       begin
-        memTraceLog.Append(Format('Hop %d "%s": %s', [ Pred(ttl), traceClient.ReplyFrom,  traceClient.ReplyErrorDesc ]));
+        memTraceLog.Append(Format('Hop %.2d (%s): %s', [
+          Pred(ttl),
+          traceClient.ReplyFrom,
+          traceClient.ReplyErrorDesc
+        ]));
         Application.ProcessMessages;
         break;
       end;
-      memTraceLog.Append(Format('Hop %d "%s": %d ms', [ Pred(ttl), traceClient.ReplyFrom,  traceClient.PingTime ]));
+      memTraceLog.Append(Format('Hop %.2d (%s): %d ms', [
+        Pred(ttl),
+        traceClient.ReplyFrom,
+        traceClient.PingTime
+      ]));
       Application.ProcessMessages;
     until traceClient.ReplyError = IE_NoError;
   finally

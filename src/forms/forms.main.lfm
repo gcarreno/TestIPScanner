@@ -9,7 +9,7 @@ object frmMain: TfrmMain
   Constraints.MinWidth = 800
   Menu = mmMain
   Position = poDefault
-  SessionProperties = 'edtEndIP.Text;edtPingHost.Text;edtStartIP.Text;Height;Left;pcMain.ActivePage;Top;Width;WindowState;edtTraceHost.Text'
+  SessionProperties = 'edtPingHost.Text;edtTraceHost.Text;Height;Left;pcMain.ActivePage;Top;Width;WindowState;edtScanStartIP.Text;edtScanEndIP.Text'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
@@ -18,9 +18,9 @@ object frmMain: TfrmMain
     Height = 500
     Top = 0
     Width = 800
-    ActivePage = tsTraceRoute
+    ActivePage = tsPing
     Align = alClient
-    TabIndex = 3
+    TabIndex = 2
     TabOrder = 0
     object tsMyIP: TTabSheet
       Caption = '&My IP'
@@ -109,7 +109,7 @@ object frmMain: TfrmMain
         BorderSpacing.Top = 4
         Constraints.MaxWidth = 300
         TabOrder = 1
-        Text = '  0.  0.  0.  0'
+        Text = '192.168.  0.254'
       end
       object panScanButtons: TPanel
         Left = 0
