@@ -72,18 +72,29 @@ begin
   FScanEntry.Status:='Starting...';
   Synchronize(@DoScanUpdate);
   Sleep(20);
+
+  { #todo -ogcarreno : Actually implement the scans }
   FScanEntry.Status:='Scanning HTTP...';
   Synchronize(@DoScanUpdate);
-  Sleep(20);
+  Sleep(1000);
+  FScanEntry.Status:='Port HTTP open';
+  Synchronize(@DoScanUpdate);
+
   FScanEntry.Status:='Scanning HTTPS...';
   Synchronize(@DoScanUpdate);
-  Sleep(20);
+  Sleep(1000);
+  FScanEntry.Status:='Port HTTPS closed';
+  Synchronize(@DoScanUpdate);
+
+
   FScanEntry.Status:='Scanning DNS...';
   Synchronize(@DoScanUpdate);
-  Sleep(20);
+  Sleep(1000);
+  FScanEntry.Status:='Port DNSS closed';
+  Synchronize(@DoScanUpdate);
+
   FScanEntry.Status:='Done!';
   Synchronize(@DoScanUpdate);
-  Sleep(10);
 end;
 
 end.

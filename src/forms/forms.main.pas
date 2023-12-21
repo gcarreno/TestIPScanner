@@ -184,6 +184,8 @@ end;
 procedure TfrmMain.ScanUpdate(const ANode: PVirtualNode; const AStatus: String);
 var
   entry: PScanEntry;
+  child: PVirtualNode;
+  IP: String;
 begin
   vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions - [toReadOnly];
   if Assigned(ANode) then
@@ -192,8 +194,34 @@ begin
     if Assigned(entry) then
     begin
       vstScan.BeginUpdate;
+      IP:= entry^.IP;
       entry^.Status:= AStatus;
       vstScan.EndUpdate;
+    end;
+    if Pos('Port', AStatus) > 0 then
+    begin
+      child:= vstScan.AddChild(ANode);
+      if Assigned(child) then
+      begin
+        entry:= vstScan.GetNodeData(child);
+        { #todo -ogcarreno : Better detection and manipulation of the status }
+        if Assigned(entry) then
+        begin
+          if Pos('HTTP', AStatus) > 0 then
+          begin
+            entry^.IP:= IP + ':HTTP';
+          end;
+          if Pos('HTTPS', AStatus) > 0 then
+          begin
+            entry^.IP:= IP + ':HTTPS';
+          end;
+          if Pos('DNS', AStatus) > 0 then
+          begin
+            entry^.IP:= IP + ':DNS';
+          end;
+          entry^.Status:= AStatus;
+        end;
+      end;
     end;
   end;
   vstScan.TreeOptions.MiscOptions:= vstScan.TreeOptions.MiscOptions + [toReadOnly];

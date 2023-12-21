@@ -178,12 +178,12 @@ object frmMain: TfrmMain
           item
             Position = 0
             Text = 'IP'
-            Width = 150
+            Width = 250
           end        
           item
             Position = 1
             Text = 'Status'
-            Width = 630
+            Width = 530
           end>
         Header.Options = [hoAutoResize, hoColumnResize, hoDblClickResize, hoDrag, hoShowSortGlyphs, hoVisible, hoAutoSpring]
         TabOrder = 3
